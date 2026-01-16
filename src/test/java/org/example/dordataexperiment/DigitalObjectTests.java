@@ -33,8 +33,6 @@ public class DigitalObjectTests {
     Random random = new Random();
     RandomStringUtils randomStringUtils = RandomStringUtils.secure();
 
-
-
     private DigitalObjectFile createFile() {
         var identifier = randomStringUtils.nextAlphanumeric(20);
         var size = random.nextLong(10000000000L);

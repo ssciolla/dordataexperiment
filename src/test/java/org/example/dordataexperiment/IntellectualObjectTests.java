@@ -37,13 +37,6 @@ public class IntellectualObjectTests {
 
     int totalNumOfVersions;
 
-    public DigitalObjectVersion createVersion(int number) {
-        var title = randomStringUtils.nextAlphanumeric(10);
-        var description = randomStringUtils.nextAlphanumeric(50);
-        return new DigitalObjectVersion(null, number,
-                LocalDateTime.now(), title, description, new HashSet<>());
-    }
-
     private ObjectFile createFile() {
         var identifier = randomStringUtils.nextAlphanumeric(20);
         var size = random.nextLong(10000000000L);
@@ -63,7 +56,6 @@ public class IntellectualObjectTests {
                 var title = randomStringUtils.nextAlphanumeric(10);
                 var description = randomStringUtils.nextAlphanumeric(50);
                 var numOfFiles = random.nextInt(10) + 1;
-                var files = new HashSet<ObjectFile>();
                 var files = Stream.generate(this::createFile).limit(numOfFiles).collect(Collectors.toSet());
                 var intObj = new IntellectualObject(
                         null,
