@@ -28,20 +28,36 @@ public class DigitalObjectTests {
     @Autowired
     CatalogService catalogService;
 
+    private static final int numOfObjects = 5000;
+
     Random random = new Random();
     RandomStringUtils randomStringUtils = RandomStringUtils.secure();
 
-    public DigitalObjectVersion createVersion(int number) {
+
+
+    private DigitalObjectFile createFile() {
+        var identifier = randomStringUtils.nextAlphanumeric(20);
+        var size = random.nextLong(10000000000L);
+        var digest = randomStringUtils.nextAlphanumeric(128);
+        return new DigitalObjectFile(null, identifier, "application/octet-stream", "content",
+                size, digest, LocalDateTime.now());
+    }
+
+    private DigitalObjectVersion createVersion(int number) {
         var title = randomStringUtils.nextAlphanumeric(10);
         var description = randomStringUtils.nextAlphanumeric(50);
-        return new DigitalObjectVersion(null, number,
-                LocalDateTime.now(), title, description, new HashSet<>());
+        var numOfFiles = random.nextInt(10) + 1;
+        HashSet<DigitalObjectFile> files = new HashSet<>();
+        for (int i = 0; i < numOfFiles; i++) {
+            files.add(createFile());
+        }
+        return new DigitalObjectVersion(null, number, LocalDateTime.now(), title, description, files);
     }
 
     @BeforeEach
     public void setup() {
         Set<DigitalObject> digObjs = new HashSet<>();
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < numOfObjects; i++) {
             Set<DigitalObjectVersion> versions = new HashSet<>();
             var numOfVersions = random.nextInt(5) + 1;
             for (int j = 0; j < numOfVersions; j++) {
@@ -68,8 +84,19 @@ public class DigitalObjectTests {
         var digObjs = digitalObjectRepo.findAll();
         Instant end = Instant.now();
         Duration duration = Duration.between(start, end);
-        System.out.println("digital object - all objects - " + duration.toMillis());
-        assertThat(digObjs).hasSize(10000);
+        System.out.println("digital object - all objects - duration: " + duration.toMillis());
+        assertThat(digObjs).hasSize(numOfObjects);
+
+        var numOfVersions = digObjs.stream().map(digObj -> digObj.versions().size())
+                .mapToInt(Integer::intValue).sum();
+        System.out.println("digital object - all objects - number of versions: " + numOfVersions);
+
+        var numOfFiles = digObjs.stream().map(digObj -> {
+            var versions = digObj.versions();
+            return versions.stream().map(v -> v.files().size())
+                    .mapToInt(Integer::intValue).sum();
+        }).mapToInt(Integer::intValue).sum();
+        System.out.println("digital object - all objects - number of files: " + numOfFiles);
     }
 
     @Test
@@ -78,7 +105,7 @@ public class DigitalObjectTests {
         var digObjsPage = digitalObjectRepo.findAll(PageRequest.of(0, 20));
         Instant end = Instant.now();
         Duration duration = Duration.between(start, end);
-        System.out.println("digital object - one page - " + duration.toMillis());
+        System.out.println("digital object - one page - duration: " + duration.toMillis());
         assertThat(digObjsPage.getContent()).hasSize(20);
     }
 
@@ -89,7 +116,7 @@ public class DigitalObjectTests {
                 PageRequest.of(0, 20));
         Instant end = Instant.now();
         Duration duration = Duration.between(start, end);
-        System.out.println("digital object - object list view - " + duration.toMillis());
+        System.out.println("digital object - object list view - duration: " + duration.toMillis());
         assertThat(summaryObjects).hasSize(20);
     }
 }
