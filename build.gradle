@@ -22,6 +22,10 @@ ext {
 	set('springModulithVersion', "2.0.1")
 }
 
+configurations {
+	mockitoAgent
+}
+
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
 	implementation 'org.springframework.boot:spring-boot-starter-webmvc'
@@ -39,6 +43,11 @@ dependencies {
 	testImplementation 'org.testcontainers:testcontainers-junit-jupiter'
 	testImplementation 'org.testcontainers:testcontainers-postgresql'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	testImplementation(libs.mockito)
+	mockitoAgent(libs.mockito) {
+		transitive = false
+	}
 }
 
 dependencyManagement {
@@ -50,6 +59,7 @@ dependencyManagement {
 
 tasks {
 	test {
+		jvmArgs += "-javaagent:${configurations.mockitoAgent.asPath}"
 		useJUnitPlatform()
 	}
 }

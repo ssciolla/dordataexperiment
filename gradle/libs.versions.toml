@@ -1,0 +1,2 @@
+[libraries]
+mockito = { module = "org.mockito:mockito-core" }
