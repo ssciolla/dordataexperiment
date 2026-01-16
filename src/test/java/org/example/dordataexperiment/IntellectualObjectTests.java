@@ -25,6 +25,9 @@ public class IntellectualObjectTests {
     @Autowired
     IntellectualObjectRepo intellectualObjectRepo;
 
+    @Autowired
+    CatalogService catalogService;
+
     Random random = new Random();
     RandomStringUtils randomStringUtils = RandomStringUtils.secure();
 
@@ -72,17 +75,28 @@ public class IntellectualObjectTests {
         var intObjs = intellectualObjectRepo.findAll();
         Instant end = Instant.now();
         Duration duration = Duration.between(start, end);
-        System.out.println(duration.toMillis());
+        System.out.println("intellectual object - all objects - " + duration.toMillis());
         assertThat(intObjs).hasSize(totalNumOfVersions);
     }
 
     @Test
     public void repoFindsOnePageOfObjects() {
         Instant start = Instant.now();
-        var intObjsPage = intellectualObjectRepo.findAllBy(PageRequest.of(0, 20));
+        var intObjsPage = intellectualObjectRepo.findAll(PageRequest.of(0, 20));
         Instant end = Instant.now();
         Duration duration = Duration.between(start, end);
-        System.out.println(duration.toMillis());
+        System.out.println("intellectual object - one page - " + duration.toMillis());
         assertThat(intObjsPage.getContent()).hasSize(20);
+    }
+
+    @Test
+    public void catalogServiceFindsSummaryObjectsUsingCurrentIntellectualObjects() {
+        Instant start = Instant.now();
+        var summaryObjects = catalogService.findAllSummaryObjectsUsingCurrentIntellectualObjects(
+                PageRequest.of(0, 20));
+        Instant end = Instant.now();
+        Duration duration = Duration.between(start, end);
+        System.out.println("intellectual object - object list view using current - " + duration.toMillis());
+        assertThat(summaryObjects).hasSize(20);
     }
 }

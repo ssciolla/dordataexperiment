@@ -54,3 +54,19 @@ CREATE TABLE IF NOT EXISTS object_file (
     created_at TIMESTAMP NOT NULL,
     intellectual_object BIGSERIAL REFERENCES intellectual_object (id)
 );
+
+CREATE OR REPLACE VIEW current_intellectual_object AS
+SELECT io.id as id,
+       io.identifier AS identifier,
+       io.alternate_identifier AS alternate_identifier,
+       io.title AS title,
+       io.type AS type,
+       io.created_at AS created_at,
+       io.version_number AS version_number
+FROM intellectual_object io
+INNER JOIN (
+    SELECT identifier, MAX(version_number) as max_value
+    FROM intellectual_object
+    GROUP BY identifier
+) max_versions
+ON io.identifier = max_versions.identifier and io.version_number = max_versions.max_value;

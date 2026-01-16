@@ -25,6 +25,9 @@ public class DigitalObjectTests {
     @Autowired
     DigitalObjectRepo digitalObjectRepo;
 
+    @Autowired
+    CatalogService catalogService;
+
     Random random = new Random();
     RandomStringUtils randomStringUtils = RandomStringUtils.secure();
 
@@ -65,17 +68,28 @@ public class DigitalObjectTests {
         var digObjs = digitalObjectRepo.findAll();
         Instant end = Instant.now();
         Duration duration = Duration.between(start, end);
-        System.out.println(duration.toMillis());
+        System.out.println("digital object - all objects - " + duration.toMillis());
         assertThat(digObjs).hasSize(10000);
     }
 
     @Test
     public void repoFindsOnePageOfObjects() {
         Instant start = Instant.now();
-        var digObjsPage = digitalObjectRepo.findAllBy(PageRequest.of(0, 20));
+        var digObjsPage = digitalObjectRepo.findAll(PageRequest.of(0, 20));
         Instant end = Instant.now();
         Duration duration = Duration.between(start, end);
-        System.out.println(duration.toMillis());
+        System.out.println("digital object - one page - " + duration.toMillis());
         assertThat(digObjsPage.getContent()).hasSize(20);
+    }
+
+    @Test
+    public void catalogServiceFindsAllSummaryObjectsUsingDigitalObjects() {
+        Instant start = Instant.now();
+        var summaryObjects = catalogService.findAllSummaryObjectsUsingDigitalObjects(
+                PageRequest.of(0, 20));
+        Instant end = Instant.now();
+        Duration duration = Duration.between(start, end);
+        System.out.println("digital object - object list view - " + duration.toMillis());
+        assertThat(summaryObjects).hasSize(20);
     }
 }
