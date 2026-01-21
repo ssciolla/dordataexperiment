@@ -14,37 +14,36 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @Import({TestDatabaseConfig.class})
-public class DigitalObjectTests {
+public class CurrentIntellectualObjectTests {
 
     @Autowired
-    DigitalObjectRepo digitalObjectRepo;
+    CurrentIntellectualObjectRepo currentIntellectualObjectRepo;
 
     static RandomStringUtils randomStringUtils = RandomStringUtils.secure();
 
-    private static DigitalObject createDigitalObject() {
+    private static IntellectualObject createKnownIntellectualObject() {
         var files = Set.of(
-                new DigitalObjectFile(null, "/some/path", "application/octet-stream",
+                new ObjectFile(null, "/some/path", "application/octet-stream",
                         "content", 1000000L, randomStringUtils.nextAlphanumeric(128),
                         LocalDateTime.now()),
-                new DigitalObjectFile(null, "/some/other/path", "application/octet-stream",
+                new ObjectFile(null, "/some/other/path", "application/octet-stream",
                         "content", 5000L, randomStringUtils.nextAlphanumeric(128),
                         LocalDateTime.now())
         );
-        var versions = Set.of(new DigitalObjectVersion(null, 1, LocalDateTime.now(),
-                "Title", "Description", files));
-        return new DigitalObject(null, "abc123", "abc123",
-                "my name", "Curio", LocalDateTime.now(), versions);
+        return new IntellectualObject(null, "abc123", "abc123",
+                "my name", "Curio", 1, LocalDateTime.now(),
+                "Title", "description", files);
     }
 
     @BeforeAll
-    static void setUp(@Autowired DigitalObjectRepo digitalObjectRepo) {
-        digitalObjectRepo.save(createDigitalObject());
+    static void setUp(@Autowired IntellectualObjectRepo intellectualObjectRepo) {
+        intellectualObjectRepo.save(createKnownIntellectualObject());
     }
 
     @Test
-    public void versionCalculatesTotalDataSize() {
-        var digObj = digitalObjectRepo.findByIdentifier("abc123").get();
-        var totalDataSize = digObj.getLatestVersion().getTotalDataSize();
+    public void currentIntellectualObjectCalculatesTotalDataSize() {
+        var currentObj = currentIntellectualObjectRepo.findByIdentifier("abc123").get();
+        var totalDataSize = currentObj.totalDataSize();
         assertThat(totalDataSize).isEqualTo(1005000L);
     }
 }

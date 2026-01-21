@@ -18,7 +18,6 @@ CREATE TABLE IF NOT EXISTS digital_object_version (
     digital_object BIGSERIAL REFERENCES digital_object (id)
 );
 
-
 CREATE TABLE IF NOT EXISTS digital_object_file (
     id BIGSERIAL PRIMARY KEY,
     identifier VARCHAR(255) NOT NULL,
@@ -57,16 +56,20 @@ CREATE TABLE IF NOT EXISTS object_file (
 
 CREATE OR REPLACE VIEW current_intellectual_object AS
 SELECT io.id as id,
-       io.identifier AS identifier,
-       io.alternate_identifier AS alternate_identifier,
-       io.title AS title,
-       io.type AS type,
-       io.created_at AS created_at,
-       io.version_number AS version_number
+    io.identifier AS identifier,
+    io.alternate_identifier AS alternate_identifier,
+    io.title AS title,
+    io.type AS type,
+    io.created_at AS created_at,
+    io.version_number AS version_number,
+    SUM(f.size) AS total_data_size
 FROM intellectual_object io
 INNER JOIN (
     SELECT identifier, MAX(version_number) as max_value
     FROM intellectual_object
     GROUP BY identifier
 ) max_versions
-ON io.identifier = max_versions.identifier and io.version_number = max_versions.max_value;
+ON io.identifier = max_versions.identifier and io.version_number = max_versions.max_value
+LEFT JOIN object_file f
+ON io.id=f.intellectual_object
+GROUP BY io.id;

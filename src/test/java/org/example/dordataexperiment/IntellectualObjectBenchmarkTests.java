@@ -3,7 +3,7 @@ package org.example.dordataexperiment;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,7 +22,7 @@ import java.util.stream.Stream;
 
 @SpringBootTest
 @Import({TestDatabaseConfig.class})
-public class IntellectualObjectTests {
+public class IntellectualObjectBenchmarkTests {
 
     @Autowired
     IntellectualObjectRepo intellectualObjectRepo;
@@ -30,14 +30,13 @@ public class IntellectualObjectTests {
     @Autowired
     CatalogService catalogService;
 
-    private static final int numOfObjects = 5000;
+    private static final int numOfObjects = 1000;
+    static Random random = new Random();
+    static RandomStringUtils randomStringUtils = RandomStringUtils.secure();
 
-    Random random = new Random();
-    RandomStringUtils randomStringUtils = RandomStringUtils.secure();
+    static int totalNumOfVersions;
 
-    int totalNumOfVersions;
-
-    private ObjectFile createFile() {
+    private static ObjectFile createFile() {
         var identifier = randomStringUtils.nextAlphanumeric(20);
         var size = random.nextLong(10000000000L);
         var digest = randomStringUtils.nextAlphanumeric(128);
@@ -45,8 +44,8 @@ public class IntellectualObjectTests {
                 size, digest, LocalDateTime.now());
     }
 
-    @BeforeEach
-    public void setup() {
+    @BeforeAll()
+    public static void setup(@Autowired IntellectualObjectRepo intellectualObjectRepo) {
         Set<IntellectualObject> intObjs = new HashSet<>();
         for (int i = 0; i < numOfObjects; i++) {
             var identifier = UUID.randomUUID().toString();
@@ -56,7 +55,8 @@ public class IntellectualObjectTests {
                 var title = randomStringUtils.nextAlphanumeric(10);
                 var description = randomStringUtils.nextAlphanumeric(50);
                 var numOfFiles = random.nextInt(10) + 1;
-                var files = Stream.generate(this::createFile).limit(numOfFiles).collect(Collectors.toSet());
+                var files = Stream.generate(IntellectualObjectBenchmarkTests::createFile)
+                        .limit(numOfFiles).collect(Collectors.toSet());
                 var intObj = new IntellectualObject(
                         null,
                         identifier,

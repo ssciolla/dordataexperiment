@@ -25,7 +25,7 @@ public class CatalogService {
             var latestVersion = digObj.getLatestVersion();
             return new SummaryObject(digObj.id(), digObj.identifier(),
                     digObj.alternateIdentifier(), latestVersion.title(),
-                    digObj.type(), digObj.createdAt());
+                    digObj.type(), digObj.createdAt(), latestVersion.getTotalDataSize());
         }).toList();
     }
 
@@ -34,8 +34,8 @@ public class CatalogService {
         var currentObjs = page.getContent();
         return currentObjs.stream().map(currentObj ->
             new SummaryObject(currentObj.id(), currentObj.identifier(),
-                currentObj.alternateIdentifier(), currentObj.title(), currentObj.type(),
-                currentObj.createdAt())
+                    currentObj.alternateIdentifier(), currentObj.title(), currentObj.type(),
+                    currentObj.createdAt(), currentObj.totalDataSize())
         ).toList();
     }
 }

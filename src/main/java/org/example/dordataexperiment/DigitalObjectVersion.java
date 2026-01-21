@@ -12,4 +12,8 @@ public record DigitalObjectVersion(
         @Column("created_at") LocalDateTime createdAt,
         @Column String title,
         @Column String description,
-        Set<DigitalObjectFile> files) {}
+        Set<DigitalObjectFile> files) {
+    public Long getTotalDataSize() {
+        return files.stream().map(DigitalObjectFile::size).mapToLong(Long::longValue).sum();
+    }
+}

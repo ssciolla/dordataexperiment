@@ -9,7 +9,8 @@ public record SummaryObject(
         String alternateIdentifier,
         String title,
         String type,
-        LocalDateTime createdAt) {
+        LocalDateTime createdAt,
+        Long totalDataSize) {
     public String getDisplayCreatedAt() {
         var formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         return createdAt.format(formatter);

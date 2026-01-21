@@ -14,4 +14,5 @@ public record CurrentIntellectualObject(
         @Column("title") String title,
         @Column String type,
         @Column("created_at") LocalDateTime createdAt,
-        @Column("version_number") Integer versionNumber) {}
+        @Column("version_number") Integer versionNumber,
+        @Column("total_data_size") Long totalDataSize) {}
