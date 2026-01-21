@@ -14,4 +14,4 @@ public record ObjectFile(
         @Column("file_function") String fileFunction,
         @Column Long size,
         @Column String digest,
-        @Column LocalDateTime createdAt) {}
+        @Column("created_at") LocalDateTime createdAt) {}
